@@ -53,22 +53,26 @@ always@(posedge clk,negedge rstn) begin
 				fault = 1'd0;
 				shutdown = 1'd0;
 			end
-			else if(volt > 32'h40a00000) 	// incase of voltage above 5V
+			else if(volt > 32'h40a00000)begin 	// incase of voltage above 5V
 				highV = 1'd1;	    	// High voltage flag is set
-			else if(current > 32'h40000000) // incase of current above 2A	
+				warning = 1'd1; end
+			else if(current > 32'h40000000)begin // incase of current above 2A	
 				highI =1'd1;		// High current flag is set
-			else if(volt < 32'h3dcccccd)	// incase current goes below 0.1A
+				warning = 1'd1; end
+			else if(volt < 32'h3dcccccd)begin	// incase current goes below 0.1A
 				lowV = 1'd1;		// Low current flag is set
+				warning = 1'd1; end
 		end
 		WARNING : begin				// after entering the warning state, the V and I is checked again.
-				if(highV || highI || lowV) // If V or I has gone back to normal levels, the flags are reset. 
-					warning = 1'd1; // a warning signal is outputted
-				else if(current < 32'h40000000)
+				if(current < 32'h40000000) begin
 					highI = 1'd0;
-				else if(volt > 32'h3dcccccd)
+			                warning = 1'd0; end
+				else if(volt > 32'h3dcccccd) begin
 					lowV = 1'd0;
-				else if(volt < 32'h40a00000)
+					warning = 1'd0; end
+				else if(volt < 32'h40a00000) begin
 					highV = 1'd0;
+					warning = 1'd0; end
 		end
 		FAULT : begin				// fault is set
 				fault = 1'd1;		
