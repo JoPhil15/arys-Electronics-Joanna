@@ -28,36 +28,42 @@ module tb_fault_Det;
     current = 32'h00000000;
 
     // Reset pulse
-    #12 rstn = 1;
+    #20 rstn = 1;
 
     // --- Test 1: Normal operation ---
     volt = 32'h3f800000;     // ~1.0
     current = 32'h3f000000;  // ~0.5
     #50;
 
-    // --- Test 2: Over voltage (> 5.0) ---
+    // --- Test 2: Over voltage (> 5.0) TRANSIENT SPIKE ---
+    volt = 32'h40a00001;
+    #20;
+    volt = 32'h3f800000;
+    #20;
+
+    // --- Test 3: Over voltage (> 5.0) LEADING TO FAULT AND SHUTDOWN ---
     volt = 32'h40a00001;
     #70;
 
-    // --- Test 3: Reset recovery after SHUTDOWN ---
+    // ---  Reset recovery after SHUTDOWN ---
     rstn = 0;
     volt = 32'h3f800000;     // 1.0
     #20 rstn = 1;
 
-    // --- Test 3: Over current (> 2.0) ---
+    // --- Test 4: Over current (> 2.0) LEADING TO FAULT AND SHUTDOWN---
     current = 32'h40000001;
     #70;
 
-    // --- Test 3: Reset recovery after SHUTDOWN ---
+    // --- Reset recovery after SHUTDOWN ---
     rstn = 0;
     current = 32'h3f000000;  // 0.5
     #20 rstn = 1;
 
-    // --- Test 4: Under voltage (< 0.1) ---
+    // --- Test 5: Under voltage (< 0.1) LEADING TO FAULT & SHUTDOWN ---
     volt = 32'h3d000000;
     #70;
 
-    // --- Test 3: Reset recovery after SHUTDOWN ---
+    // --- Reset recovery after SHUTDOWN ---
     rstn = 0;
     volt = 32'h3f800000;     // 1.0
     #20 rstn = 1;
@@ -87,4 +93,3 @@ module tb_fault_Det;
   end
 
 endmodule
-
